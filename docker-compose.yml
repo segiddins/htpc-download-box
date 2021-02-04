@@ -98,7 +98,7 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - ${ROOT}/config/lidarr:/config # config files
-      - ${MEDIA_DIR}/Music:/muic # music folder
+      - ${MEDIA_DIR}/Music:/music # music folder
       - ${ROOT}/downloads:/downloads # download folder
 
   bazarr:
