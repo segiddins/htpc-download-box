@@ -58,7 +58,7 @@ services:
 
   sonarr:
     container_name: sonarr
-    image: linuxserver/sonarr:latest
+    image: linuxserver/sonarr:preview
     restart: unless-stopped
     network_mode: host
     environment:
@@ -117,3 +117,16 @@ services:
       - ${MEDIA_DIR}/TV:/tv # tv shows folder
     ports:
       - 6767:6767
+
+  tautulli:
+    image: tautulli/tautulli
+    container_name: tautulli
+    restart: unless-stopped
+    volumes:
+      - ${ROOT}/config/tautulli:/config # config files
+    environment:
+      - PUID=${PUID} # default user id, defined in .env
+      - PGID=${PGID} # default group id, defined in .env
+      - TZ=${TZ} # timezone, defined in .env
+    port:
+      - 8181:8181
