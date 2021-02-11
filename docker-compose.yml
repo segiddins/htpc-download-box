@@ -128,5 +128,5 @@ services:
       - PUID=${PUID} # default user id, defined in .env
       - PGID=${PGID} # default group id, defined in .env
       - TZ=${TZ} # timezone, defined in .env
-    port:
+    ports:
       - 8181:8181
