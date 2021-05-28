@@ -58,7 +58,7 @@ services:
 
   sonarr:
     container_name: sonarr
-    image: linuxserver/sonarr:preview
+    image: linuxserver/sonarr:latest
     restart: unless-stopped
     network_mode: host
     environment:
