@@ -115,8 +115,6 @@ services:
       - ${ROOT}/config/bazarr:/config # config files
       - ${MEDIA_DIR}/Movies:/movies # movies folder
       - ${MEDIA_DIR}/TV:/tv # tv shows folder
-    ports:
-      - 6767:6767
 
   tautulli:
     image: tautulli/tautulli
