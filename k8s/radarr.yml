@@ -1,0 +1,76 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: kompose convert --out k8s
+    kompose.version: 1.32.0 (HEAD)
+  labels:
+    io.kompose.service: radarr
+  name: radarr
+spec:
+  ports:
+    - name: "7878"
+      port: 7878
+      targetPort: 7878
+  selector:
+    io.kompose.service: radarr
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert --out k8s
+    kompose.version: 1.32.0 (HEAD)
+  labels:
+    io.kompose.service: radarr
+  name: radarr
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: radarr
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert --out k8s
+        kompose.version: 1.32.0 (HEAD)
+      labels:
+        io.kompose.network/htpc-download-box-default: "true"
+        io.kompose.service: radarr
+    spec:
+      containers:
+        - env:
+            - name: PGID
+            - name: PUID
+            - name: TZ
+          image: linuxserver/radarr:latest
+          name: radarr
+          volumeMounts:
+            - mountPath: /etc/localtime
+              name: localtime
+              readOnly: true
+            - mountPath: /config
+              name: config
+            - mountPath: /movies
+              name: movies
+            - mountPath: /downloads
+              name: downloads
+      restartPolicy: Always
+      volumes:
+        - name: config
+          hostPath:
+            path: /mnt/mac/Users/segiddins/.config/radarr
+        - name: localtime
+          hostPath:
+            path: /etc/localtime
+            type: File
+        - name: movies
+          hostPath:
+            path: /mnt/mac/Volumes/Media/Movies
+        - name: downloads
+          hostPath:
+            path: /mnt/mac/Volumes/docker/htpc-download-box/downloads

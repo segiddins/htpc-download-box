@@ -1,0 +1,77 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: kompose convert --out k8s
+    kompose.version: 1.32.0 (HEAD)
+  labels:
+    io.kompose.service: jackett
+  name: jackett
+spec:
+  ports:
+    - name: "9117"
+      port: 9117
+      targetPort: 9117
+  selector:
+    io.kompose.service: jackett
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert --out k8s
+    kompose.version: 1.32.0 (HEAD)
+  labels:
+    io.kompose.service: jackett
+  name: jackett
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: jackett
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert --out k8s
+        kompose.version: 1.32.0 (HEAD)
+      labels:
+        io.kompose.network/htpc-download-box-default: "true"
+        io.kompose.service: jackett
+    spec:
+      containers:
+        - env:
+            - name: PGID
+              value: "100"
+            - name: PUID
+              value: "1026"
+            - name: TZ
+              value: "America/Los_Angeles"
+          image: linuxserver/jackett:latest
+          name: jackett
+          volumeMounts:
+            - mountPath: /etc/localtime
+              name: localtime
+              readOnly: true
+            - mountPath: /downloads
+              name: downloads
+            - mountPath: /config
+              name: config
+      restartPolicy: Always
+      volumes:
+        - name: config
+          # Mac filesystem is mounted as /mnt/mac
+          hostPath:
+            path: /mnt/mac/Users/segiddins/.config/jackett
+            type: Directory
+        - name: downloads
+          hostPath:
+            path: /mnt/mac/Volumes/docker/htpc-download-box/downloads/torrent-blackhole
+            type: Directory
+        - name: localtime
+          hostPath:
+            path: /etc/localtime
+            type: File

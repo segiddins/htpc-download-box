@@ -1,0 +1,56 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert --out k8s
+    kompose.version: 1.32.0 (HEAD)
+  labels:
+    io.kompose.service: bazarr
+  name: bazarr
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: bazarr
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert --out k8s
+        kompose.version: 1.32.0 (HEAD)
+      labels:
+        io.kompose.network/htpc-download-box-default: "true"
+        io.kompose.service: bazarr
+    spec:
+      containers:
+        - env:
+            - name: PGID
+              value: "100"
+            - name: PUID
+              value: "1026"
+            - name: TZ
+              value: "America/Los_Angeles"
+            - name: UMASK_SET
+              value: "022"
+          image: linuxserver/bazarr:latest
+          name: bazarr
+          volumeMounts:
+            - mountPath: /config
+              name: config
+            - mountPath: /movies
+              name: movies
+            - mountPath: /tv
+              name: tv
+      restartPolicy: Always
+      volumes:
+        - name: config
+          hostPath:
+            path: /mnt/mac/Users/segiddins/.config/bazarr
+        - name: movies
+          hostPath:
+            path: /mnt/mac/Volumes/Media/Movies
+        - name: tv
+          hostPath:
+            path: /mnt/mac/Volumes/Media/TV

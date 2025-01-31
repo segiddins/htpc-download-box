@@ -1,0 +1,34 @@
+media.segiddins.me, hubble.folk-dinosaur.ts.net {
+  # Overseerr
+	reverse_proxy overseerr.media.svc.cluster.local:5055
+
+  # Hosts with public access need to authenticate admin services
+	@admin {
+		host media.segiddins.me # public internet
+		host hubble.folk-dinosaur.ts.net # shared on tailscale
+		# path /tv*
+		# path /movies*
+		# path /subtitles*
+		# path /music*
+		# path /activity*
+		# path /torrents*
+	}
+
+	# # Sonarr
+	# redir /tv /tv/ 308
+	# reverse_proxy /tv/* sonarr.media.svc.cluster.local:8989
+
+	# # Tautulli
+	# redir /activity /activity/ 308
+	# reverse_proxy /activity/* tautulli.media.svc.cluster.local:8181
+
+  # Auth admin services with Tailscale, only allow personal Tailnet
+	forward_auth @admin unix//opt/homebrew/var/run/tailscale.nginx-auth.sock {
+		uri /auth
+		header_up Remote-Addr {remote_host}
+		header_up Remote-Port {remote_port}
+		header_up Original-URI {uri}
+		header_up Expected-Tailnet "folk-dinosaur.ts.net."
+		copy_headers Tailscale-User Tailscale-Name Tailscale-Login Tailscale-Tailnet Tailscale-Profile-Picture
+	}
+}

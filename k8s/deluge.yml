@@ -1,0 +1,70 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: kompose convert --out k8s
+    kompose.version: 1.32.0 (HEAD)
+  labels:
+    io.kompose.service: deluge
+  name: deluge
+spec:
+  ports:
+    - name: "8112"
+      port: 8112
+      targetPort: 8112
+  selector:
+    io.kompose.service: deluge
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert --out k8s
+    kompose.version: 1.32.0 (HEAD)
+  labels:
+    io.kompose.service: deluge
+  name: deluge
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: deluge
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert --out k8s
+        kompose.version: 1.32.0 (HEAD)
+      labels:
+        io.kompose.network/htpc-download-box-default: "true"
+        io.kompose.service: deluge
+    spec:
+      containers:
+        - env:
+            - name: PGID
+              value: "100"
+            - name: PUID
+              value: "1026"
+            - name: TZ
+              value: "America/Los_Angeles"
+          image: linuxserver/deluge:latest
+          name: deluge
+          volumeMounts:
+            - mountPath: /downloads
+              name: downloads
+            - mountPath: /config
+              name: config
+      restartPolicy: Always
+      volumes:
+        - name: config
+          # Mac filesystem is mounted as /mnt/mac
+          hostPath:
+            path: /mnt/mac/Users/segiddins/.config/deluge
+            type: Directory
+        - name: downloads
+          hostPath:
+            path: /mnt/mac/Volumes/docker/htpc-download-box/downloads
+            type: Directory

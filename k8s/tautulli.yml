@@ -6,15 +6,15 @@ metadata:
     kompose.cmd: kompose convert --out k8s
     kompose.version: 1.32.0 (HEAD)
   labels:
-    io.kompose.service: overseerr
-  name: overseerr
+    io.kompose.service: tautulli
+  name: tautulli
 spec:
   ports:
-    - name: "5055"
-      port: 5055
-      targetPort: 5055
+    - name: "8181"
+      port: 8181
+      targetPort: 8181
   selector:
-    io.kompose.service: overseerr
+    io.kompose.service: tautulli
 
 ---
 apiVersion: apps/v1
@@ -24,13 +24,13 @@ metadata:
     kompose.cmd: kompose convert --out k8s
     kompose.version: 1.32.0 (HEAD)
   labels:
-    io.kompose.service: overseerr
-  name: overseerr
+    io.kompose.service: tautulli
+  name: tautulli
 spec:
   replicas: 1
   selector:
     matchLabels:
-      io.kompose.service: overseerr
+      io.kompose.service: tautulli
   strategy:
     type: Recreate
   template:
@@ -40,27 +40,27 @@ spec:
         kompose.version: 1.32.0 (HEAD)
       labels:
         io.kompose.network/htpc-download-box-default: "true"
-        io.kompose.service: overseerr
+        io.kompose.service: tautulli
     spec:
       containers:
         - env:
-            - name: LOG_LEVEL
-              value: debug
+            - name: PGID
+              value: "100"
+            - name: PUID
+              value: "1026"
             - name: TZ
-              value: America/Los_Angeles
-          image: sctx/overseerr:develop
-          name: overseerr
+              value: "America/Los_Angeles"
+          image: tautulli/tautulli
+          name: tautulli
           ports:
-            - containerPort: 5055
-              hostPort: 5055
+            - containerPort: 8181
+              hostPort: 8181
               protocol: TCP
           volumeMounts:
-            - mountPath: /app/config
+            - mountPath: /config
               name: config
       restartPolicy: Always
       volumes:
         - name: config
           hostPath:
-            # Mac filesystem is mounted as /mnt/mac
-            path: /mnt/mac/Users/segiddins/.config/overseerr
-            type: Directory # this field is optional
+            path: /mnt/mac/Users/segiddins/.config/tautulli
