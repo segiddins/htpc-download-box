@@ -1,0 +1,88 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    io.kompose.service: kindle-connector
+  name: kindle-connector
+spec:
+  ports:
+    - name: "5050"
+      port: 5050
+      targetPort: 5050
+  selector:
+    io.kompose.service: kindle-connector
+
+# The "kindle-connector" Secret holds all credentials and is intentionally NOT
+# committed. Apply it out-of-band from the gitignored k8s/kindle-connector.secret.yml
+# (template in that file). It must provide: JACKETT_API_KEY, QBIT_USER, QBIT_PASS,
+# BRIDGE_TOKEN, SMTP_USER, SMTP_PASS, KINDLE_EMAIL.
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    io.kompose.service: kindle-connector
+  name: kindle-connector
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: kindle-connector
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        io.kompose.network/htpc-download-box-default: "true"
+        io.kompose.service: kindle-connector
+    spec:
+      containers:
+        - name: kindle-connector
+          image: kindle-connector-bridge:latest
+          imagePullPolicy: Never  # locally built via `docker build`, not pulled
+          ports:
+            - containerPort: 5050
+          env:
+            - name: JACKETT_URL
+              value: "http://jackett:9117"
+            - name: QBIT_URL
+              value: "http://100.121.168.48:9092"
+            - name: SMTP_HOST
+              value: "smtp.gmail.com"
+            - name: SMTP_PORT
+              value: "587"
+            # qBittorrent's default save path, identical on the Mac and (via the
+            # downloads mount below) inside this pod, so paths the qBit API
+            # reports resolve to real files here.
+            - name: DOWNLOAD_DIR
+              value: "/Volumes/Scratch/downloads/complete"
+          envFrom:
+            - secretRef:
+                name: kindle-connector
+          volumeMounts:
+            - mountPath: /Volumes/Scratch/downloads
+              name: downloads
+            # "books" category saves here; bridge reads the completed file to
+            # convert + email. Same absolute path as on the Mac (and qBit).
+            - mountPath: /Volumes/Storage/Books
+              name: books
+            - mountPath: /data
+              name: data
+      restartPolicy: Always
+      volumes:
+        # Mounted at the same absolute path qBittorrent uses on the Mac so the
+        # bridge can read completed downloads by the path qBit reports.
+        - name: downloads
+          hostPath:
+            path: /mnt/mac/Volumes/Scratch/downloads
+            type: Directory
+        - name: books
+          hostPath:
+            path: /mnt/mac/Volumes/Storage/Books
+            type: Directory
+        - name: data
+          hostPath:
+            path: /mnt/mac/Users/segiddins/.config/kindle-connector
+            type: DirectoryOrCreate

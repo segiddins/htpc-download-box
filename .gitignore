@@ -3,3 +3,6 @@
 *.log
 config
 downloads
+
+# k8s secrets — never commit credentials
+k8s/*.secret.yml
