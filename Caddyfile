@@ -51,3 +51,10 @@ media.segiddins.me, hubble.folk-dinosaur.ts.net {
 		copy_headers Tailscale-User Tailscale-Name Tailscale-Login Tailscale-Tailnet Tailscale-Profile-Picture
 	}
 }
+
+# kindle-connector bridge — publicly reachable for external integrations.
+# Auth is the bridge's own X-Bridge-Token (every endpoint except /health),
+# so no Tailscale forward_auth here.
+kindle-connector-bridge.schlacter.me {
+	reverse_proxy kindle-connector.media.svc.cluster.local:5050
+}
