@@ -50,7 +50,7 @@ spec:
             path: /mnt/mac/Users/segiddins/.config/bazarr
         - name: movies
           hostPath:
-            path: /mnt/mac/Volumes/Media/Movies
+            path: /mnt/mac/Volumes/Storage/Media/Movies
         - name: tv
           hostPath:
-            path: /mnt/mac/Volumes/Media/TV
+            path: /mnt/mac/Volumes/Storage/Media/TV

@@ -57,7 +57,7 @@ spec:
               name: config
             - mountPath: /movies
               name: movies
-            - mountPath: /downloads
+            - mountPath: /Volumes/Scratch/downloads
               name: downloads
       restartPolicy: Always
       volumes:
@@ -70,7 +70,7 @@ spec:
             type: File
         - name: movies
           hostPath:
-            path: /mnt/mac/Volumes/Media/Movies
+            path: /mnt/mac/Volumes/Storage/Media/Movies
         - name: downloads
           hostPath:
-            path: /mnt/mac/Volumes/docker/htpc-download-box/downloads
+            path: /mnt/mac/Volumes/Scratch/downloads

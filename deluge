@@ -1,0 +1,1 @@
+uvx --from 'deluge[all]==2.1.1' --with legacy-cgi --with libtorrent deluge-web --config /Users/segiddins/.config/deluge -d

@@ -60,7 +60,7 @@ spec:
               name: config
             - mountPath: /tv
               name: tv
-            - mountPath: /downloads
+            - mountPath: /Volumes/Scratch/downloads
               name: downloads
       restartPolicy: Always
       volumes:
@@ -69,11 +69,11 @@ spec:
             path: /mnt/mac/Users/segiddins/.config/sonarr
         - name: tv
           hostPath:
-            path: /mnt/mac/Volumes/Media/TV
+            path: /mnt/mac/Volumes/Storage/Media/TV
         - name: localtime
           hostPath:
             path: /etc/localtime
             type: File
         - name: downloads
           hostPath:
-            path: /mnt/mac/Volumes/docker/htpc-download-box/downloads
+            path: /mnt/mac/Volumes/Scratch/downloads
