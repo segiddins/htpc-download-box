@@ -47,6 +47,11 @@ spec:
           env:
             - name: JACKETT_URL
               value: "http://jackett:9117"
+            # Query MyAnonamouse only. The aggregate "all" indexer blocks on the
+            # slowest configured indexer (~40s for a books search) and blows past
+            # the bridge's 30s HTTP timeout. Comma-separate to add more.
+            - name: JACKETT_INDEXERS
+              value: "myanonamouse"
             - name: QBIT_URL
               value: "http://100.121.168.48:9092"
             - name: SMTP_HOST
